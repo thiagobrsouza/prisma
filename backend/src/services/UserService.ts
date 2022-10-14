@@ -18,14 +18,19 @@ export class UserService {
     if (userExists) {
       throw new Error('User already exists')
     }
-    await prisma.user.create({
+    return await prisma.user.create({
       data: {
         name: name,
         email: email,
         password: password,
         notes: notes,
-        profileId: profileId
-      }
+        profile: {
+          connect: {
+            id: profileId
+          }
+        }
+      },
+      include: { profile: true }
     })
   }
 
@@ -56,17 +61,21 @@ export class UserService {
     if (userExists && userExists.id !== userFounded?.id) {
       throw new Error('User already exists')
     }
-    await prisma.user.update({
+    return await prisma.user.update({
       where: { id: id },
       data: {
         name: name,
         email: email,
         password: password,
         notes: notes,
-        profileId: profileId
-      }
+        profile: {
+          connect: {
+            id: profileId
+          }
+        }
+      },
+      include: { profile: true }
     })
-    return user
   }
 
   async remove(id: number) {
